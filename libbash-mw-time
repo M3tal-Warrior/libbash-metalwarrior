@@ -1,15 +1,15 @@
 #!/bin/bash
-# Library for different scripts
+# Bash library for timing functions
 
 # Calculates the duration between two time spots
-lsmt_duration() {
+lmti_duration() {
   # Takes time spots as parameters 1 and 2 (chronological!) and the output
   # format as parameter 3
   # Output format may be hours, minutes, seconds as well as HH:MM:SS or HHMMSS.
   # It will be rounded down if necessary
   # Returns 0 on success
   # Returns 1 on errors
-  # Sets LSMT_TIME to duration
+  # Sets LMTI_TIME to duration
   
   # Fetch parameters
   local START="$1"
@@ -17,15 +17,15 @@ lsmt_duration() {
   local FORMAT="$3"
   
   # Reformat times to HHMMSS
-  if lsmt_formatspot "$START" "HHMMSS"
+  if lmti_formatspot "$START" "HHMMSS"
     then
-      START="$LSMT_TIME"
+      START="$LMTI_TIME"
     else
       return 1
   fi
-  if lsmt_formatspot "$END" "HHMMSS"
+  if lmti_formatspot "$END" "HHMMSS"
     then
-      END="$LSMT_TIME"
+      END="$LMTI_TIME"
     else
       return 1
   fi
@@ -46,13 +46,13 @@ lsmt_duration() {
   # Set output format
   case "$FORMAT" in
     hours)
-      LSMT_TIME=$(( DURATION / 3600 ))
+      LMTI_TIME=$(( DURATION / 3600 ))
       ;;
     minutes)
-      LSMT_TIME=$(( DURATION / 60 ))
+      LMTI_TIME=$(( DURATION / 60 ))
       ;;
     seconds)
-      LSMT_TIME="$DURATION"
+      LMTI_TIME="$DURATION"
       ;;
     *)
       # Calculate hours, minutes and seconds
@@ -76,12 +76,12 @@ lsmt_duration() {
       # Decide on format
       if [ "$FORMAT" = "HHMMSS" ]
         then
-          LSMT_TIME="$HOURS$MINUTES$SECONDS"
+          LMTI_TIME="$HOURS$MINUTES$SECONDS"
       elif [ "$FORMAT" = "HH:MM:SS" ]
         then
-          LSMT_TIME="$HOURS:$MINUTES:$SECONDS"
+          LMTI_TIME="$HOURS:$MINUTES:$SECONDS"
         else
-          LSMT_TIME=""
+          LMTI_TIME=""
           return 1
       fi
       ;;
@@ -90,12 +90,12 @@ lsmt_duration() {
 }
 
 # Reformats time spots to single number
-lsmt_formatspot() {
+lmti_formatspot() {
   # Takes time as parameter 1 and output format as parameter 2
   # Works with input formats HHMMSS, HH:MM:SS, HHMM, HH:MM
   # Returns 0 on success
   # Returns 1 on errors
-  # Sets LSMT_TIME to input time with output format
+  # Sets LMTI_TIME to input time with output format
   local INPUT="$1"
   local FORMAT="$2"
   
@@ -129,19 +129,19 @@ lsmt_formatspot() {
   # Set to output format
   case "$FORMAT" in
     HHMM)
-      LSMT_TIME="$HOUR$MINUTE"
+      LMTI_TIME="$HOUR$MINUTE"
       ;;
     HH:MM)
-      LSMT_TIME="$HOUR:$MINUTE"
+      LMTI_TIME="$HOUR:$MINUTE"
       ;;
     HHMMSS)
-      LSMT_TIME="$HOUR$MINUTE$SECOND"
+      LMTI_TIME="$HOUR$MINUTE$SECOND"
       ;;
     HH:MM:SS)
-      LSMT_TIME="$HOUR:$MINUTE:$SECOND"
+      LMTI_TIME="$HOUR:$MINUTE:$SECOND"
       ;;
     *)
-      LSMT_TIME=""
+      LMTI_TIME=""
       return 1
       ;;
   esac
@@ -149,7 +149,7 @@ lsmt_formatspot() {
 }
 
 # Calculate if the current time fits the configured time frame
-lsmt_nowin() {
+lmti_nowin() {
   # Takes start time as parameter 1 and end time as parameter 2
   # Works with formats HHMMSS, HH:MM:SS, HHMM, HH:MM
   # Returns 0 on yes
@@ -160,10 +160,10 @@ lsmt_nowin() {
   local END="$2"
   
   # Get current time
-  local TIME=`date +'%H%M%S'`
+  local TIME=$(date +'%H%M%S')
   
   # Calculate
-  if lsmt_timein "$START" "$END" "$TIME"
+  if lmti_timein "$START" "$END" "$TIME"
     then
       return 0
     else
@@ -172,7 +172,7 @@ lsmt_nowin() {
 }
 
 # Calculate if the set time fits the configured time frame
-lsmt_timein() {
+lmti_timein() {
   # Takes start time as parameter 1 and end time as parameter 2, as well as
   # the time to check as parameter 3
   # Works with formats HHMMSS, HH:MM:SS, HHMM, HH:MM
@@ -185,21 +185,21 @@ lsmt_timein() {
   local TIME="$3"
   
   # Reformat times to HHMMSS
-  if lsmt_formatspot "$START" "HHMMSS"
+  if lmti_formatspot "$START" "HHMMSS"
     then
-      START="$LSMT_TIME"
+      START="$LMTI_TIME"
     else
       return 1
   fi
-  if lsmt_formatspot "$END" "HHMMSS"
+  if lmti_formatspot "$END" "HHMMSS"
     then
-      END="$LSMT_TIME"
+      END="$LMTI_TIME"
     else
       return 1
   fi
-  if lsmt_formatspot "$TIME" "HHMMSS"
+  if lmti_formatspot "$TIME" "HHMMSS"
     then
-      TIME="$LSMT_TIME"
+      TIME="$LMTI_TIME"
     else
       return 1
   fi
