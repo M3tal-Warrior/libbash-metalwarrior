@@ -1,0 +1,76 @@
+#!/bin/bash
+# Library for different scripts
+
+# Logging
+lsmb_logger() {
+  # Takes the message as parameter 1
+  # Returns nothing
+  
+  # Only log on set log file
+  if [ "$LSMB_LOG" != "" ]
+    then
+      echo "`date +'%F %T'`: $*" >> "$LSMB_LOG"
+  fi
+}
+
+# Managing a PID file
+lsmb_pidfile() {
+  # Gets the action as parameter 1; demands for LSMB_PIDFILE and LSMB_MYPID to
+  # be set
+  # Returns 0 on OK
+  # Returns 1 on errors
+  
+  # Check prerequisites
+  if [ "$LSMB_MYPID" = "" -o "$LSMB_PIDFILE" = "" ]
+    then
+      return 1
+  fi
+  
+  # Set or delete the PID file
+  case "$1" in
+    delete)
+      if rm -f "$LSMB_PIDFILE" > /dev/null 2>&1
+        then
+          return 0
+        else
+          return 1
+      fi
+      ;;
+    set)
+      # Probes for orphaned PID
+      if [ -f "$LSMB_PIDFILE" ]
+        then
+          local PID=$(<"$LSMB_PIDFILE")
+          # Check if this PID is still used by a running process
+          if ps ax | grep "$PID" | grep "$0" > /dev/null
+            then
+              # Check if we are the running process
+              if [ "$PID" = "$LSMB_MYPID" ]
+                then
+                  # PID file is ours, no need to set again
+                  return 0
+                else
+                  # PID file belongs to a running process
+                  return 1
+              fi
+            else
+              rm -f "$LSMB_PIDFILE"
+          fi
+      fi
+
+      # Write PID file
+      echo "$LSMB_MYPID" > "$LSMB_PIDFILE"
+      # Sleep for a random amount of milliseconds before reading the PID file
+      # again to provide hardening against race conditions
+      sleep 0.${RANDOM}
+      local PID=$(<"$LSMB_PIDFILE")
+      if [ "$PID" = "$LSMB_MYPID" ]
+        then
+          return 0
+        else
+          return 1
+      fi
+      ;;
+  esac
+}
+
