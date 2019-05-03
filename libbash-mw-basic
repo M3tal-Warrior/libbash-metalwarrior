@@ -1,9 +1,28 @@
 #!/bin/bash
 # Bash library for basic script functions
 
+# Debug logging
+# Logs differencial time between start and the time the log is written
+lmba_difflogger() {
+  # Takes the message as parameter 1; demands for LMBA_LOG and LMBA_STARTTIME
+  # to be set
+  # Returns nothing
+  
+  # Only log on set log file
+  if [ "$LMBA_LOG" != "" -a "$LMBA_STARTTIME" != "" ]
+    then
+      local TIME=$(echo "$(date +'%s.%N') - $LMBA_STARTTIME" | bc -l)
+      if [ "${TIME:0:1}" = "." ]
+        then
+          TIME="0$TIME"
+      fi
+      echo "$TIME: $*" >> "$LMBA_LOG"
+  fi
+}
+
 # Logging
 lmba_logger() {
-  # Takes the message as parameter 1
+  # Takes the message as parameter 1; demands for LMBA_LOG to be set
   # Returns nothing
   
   # Only log on set log file
@@ -73,4 +92,3 @@ lmba_pidfile() {
       ;;
   esac
 }
-
