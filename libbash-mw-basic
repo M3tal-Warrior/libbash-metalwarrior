@@ -1,6 +1,33 @@
 #!/bin/bash
 # Bash library for basic script functions
 
+# Check directories/files existence
+lmba_checkexist() {
+  # Takes the checked type as parameter 1, the path itself as parameter 2 and
+  # the exit code on failure as parameter 3
+  # If the failure exit code is 0, no exit is performed and the module returns
+  # normally
+  # Returns 0 on existence
+  # Returns 1 on nonexistence (if failure exit code is set to 0)
+
+  # Check
+  if [ -"$1" "$2" ]
+    then
+      # Existing dir/file
+      return 0
+    else
+      if [ "$3" = "0" ]
+        then
+          # Nonexistence is deemed not critical
+          return 1
+        else
+          # Nonexistence is deemed critial, log that
+          lmba_echolog "$2 of type $1 does not exist!"
+          exit "$3"
+      fi
+  fi
+}
+
 # Debug logging
 # Logs differencial time between start and the time the log is written
 lmba_difflogger() {
