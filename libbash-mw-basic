@@ -20,6 +20,24 @@ lmba_difflogger() {
   fi
 }
 
+# Logging with additional echo to STDOUT
+lmba_echolog() {
+  # Takes the message as parameter 1; submodules demand for LMBA_LOG to be set
+  # If LMBA_STARTTIME is set too, it will use lmba_difflogger as submodule,
+  # otherwise it'll be lmba_logger
+  # Returns nothing
+
+  # Push message to STDOUT
+  echo "$*"
+  # Invoke submodule for logging to file
+  if [ "$LMBA_STARTTIME" != "" ]
+    then
+      lmba_difflogger "$*"
+    else
+      lmba_logger "$*"
+  fi
+}
+
 # Logging
 lmba_logger() {
   # Takes the message as parameter 1; demands for LMBA_LOG to be set
